@@ -1,97 +1,29 @@
-This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
+## Push Notifications (FCM)
 
-# Getting Started
-
-> **Note**: Make sure you have completed the [Set Up Your Environment](https://reactnative.dev/docs/set-up-your-environment) guide before proceeding.
-
-## Step 1: Start Metro
-
-First, you will need to run **Metro**, the JavaScript build tool for React Native.
-
-To start the Metro dev server, run the following command from the root of your React Native project:
-
-```sh
-# Using npm
-npm start
-
-# OR using Yarn
-yarn start
-```
-
-## Step 2: Build and run your app
-
-With Metro running, open a new terminal window/pane from the root of your React Native project, and use one of the following commands to build and run your Android or iOS app:
+Este projeto usa `@react-native-firebase/messaging`.
 
 ### Android
 
-```sh
-# Using npm
-npm run android
-
-# OR using Yarn
-yarn android
-```
+- Permissão `POST_NOTIFICATIONS` é pedida em runtime (Android 13+).
+- `index.js` contém `setBackgroundMessageHandler` para mensagens em background.
+- Teste:
+  1. Rode o app em **device/emulador Android**.
+  2. Copie o token do log (`[FCM] token: ...`).
+  3. Firebase Console → _Cloud Messaging_ → **Send test message** → cole o token.
+  4. Em **foreground**, aparece um `Alert` (via `onMessage`).
+  5. Em **background**/fechado, a notificação aparece no tray (payload `notification`).
 
 ### iOS
 
-For iOS, remember to install CocoaPods dependencies (this only needs to be run on first clone or after updating native deps).
+> **Requer Apple Developer Program** (conta paga) + **APNs**. O simulador **não recebe** push.
 
-The first time you create a new project, run the Ruby bundler to install CocoaPods itself:
+1. Gere uma **APNs Auth Key (.p8)** no Apple Developer (Keys → “+” → marque APNs).  
+   Anote **Key ID** e **Team ID**.
+2. Firebase Console → _Project settings_ → _Cloud Messaging_ → **Apple app configuration** → suba a `.p8` + Key ID + Team ID.
+3. Xcode (Target):
+   - _Signing & Capabilities_ → adicione **Push Notifications** e **Background Modes → Remote notifications**.
+   - Use **Automatic signing**.
+4. Rode em **dispositivo físico**. O app chama `registerDeviceForRemoteMessages()` e `requestPermission()`.
+5. Copie o token do log e envie teste pelo Console do Firebase.
 
-```sh
-bundle install
-```
-
-Then, and every time you update your native dependencies, run:
-
-```sh
-bundle exec pod install
-```
-
-For more information, please visit [CocoaPods Getting Started guide](https://guides.cocoapods.org/using/getting-started.html).
-
-```sh
-# Using npm
-npm run ios
-
-# OR using Yarn
-yarn ios
-```
-
-If everything is set up correctly, you should see your new app running in the Android Emulator, iOS Simulator, or your connected device.
-
-This is one way to run your app — you can also build it directly from Android Studio or Xcode.
-
-## Step 3: Modify your app
-
-Now that you have successfully run the app, let's make changes!
-
-Open `App.tsx` in your text editor of choice and make some changes. When you save, your app will automatically update and reflect these changes — this is powered by [Fast Refresh](https://reactnative.dev/docs/fast-refresh).
-
-When you want to forcefully reload, for example to reset the state of your app, you can perform a full reload:
-
-- **Android**: Press the <kbd>R</kbd> key twice or select **"Reload"** from the **Dev Menu**, accessed via <kbd>Ctrl</kbd> + <kbd>M</kbd> (Windows/Linux) or <kbd>Cmd ⌘</kbd> + <kbd>M</kbd> (macOS).
-- **iOS**: Press <kbd>R</kbd> in iOS Simulator.
-
-## Congratulations! :tada:
-
-You've successfully run and modified your React Native App. :partying_face:
-
-### Now what?
-
-- If you want to add this new React Native code to an existing application, check out the [Integration guide](https://reactnative.dev/docs/integration-with-existing-apps).
-- If you're curious to learn more about React Native, check out the [docs](https://reactnative.dev/docs/getting-started).
-
-# Troubleshooting
-
-If you're having issues getting the above steps to work, see the [Troubleshooting](https://reactnative.dev/docs/troubleshooting) page.
-
-# Learn More
-
-To learn more about React Native, take a look at the following resources:
-
-- [React Native Website](https://reactnative.dev) - learn more about React Native.
-- [Getting Started](https://reactnative.dev/docs/environment-setup) - an **overview** of React Native and how setup your environment.
-- [Learn the Basics](https://reactnative.dev/docs/getting-started) - a **guided tour** of the React Native **basics**.
-- [Blog](https://reactnative.dev/blog) - read the latest official React Native **Blog** posts.
-- [`@facebook/react-native`](https://github.com/facebook/react-native) - the Open Source; GitHub **repository** for React Native.
+> Sem APNs configurado, o iOS não vai receber push (o Android funciona normalmente). O código já está pronto; basta adicionar as credenciais conforme acima.
