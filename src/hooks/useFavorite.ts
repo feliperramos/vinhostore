@@ -1,6 +1,14 @@
+// src/hooks/useFavorites.ts (versão modular)
 import { useEffect, useMemo, useState } from 'react';
-import { firestore } from '@/firebase';
 import { useAuth } from '@/providers/Auth.provider';
+import {
+  getFirestore,
+  collection,
+  doc,
+  onSnapshot,
+  setDoc,
+  deleteDoc,
+} from '@react-native-firebase/firestore';
 import type { Favorite, Product } from '@/types';
 
 export function useFavorites() {
@@ -13,18 +21,17 @@ export function useFavorites() {
       setFavorites(new Map());
       return;
     }
-    const ref = firestore()
-      .collection('users')
-      .doc(uid)
-      .collection('favorites');
-    const unsub = ref.onSnapshot(snap => {
+    const db = getFirestore();
+    const ref = collection(doc(collection(db, 'users'), uid), 'favorites');
+
+    const unsub = onSnapshot(ref, snap => {
       const map = new Map<number, Favorite>();
-      snap.forEach(doc => {
-        const data = doc.data() as Favorite;
-        map.set(Number(doc.id), data);
+      snap.forEach((d: { id: any; data: () => Favorite }) => {
+        map.set(Number(d.id), d.data() as Favorite);
       });
       setFavorites(map);
     });
+
     return unsub;
   }, [uid]);
 
@@ -32,23 +39,21 @@ export function useFavorites() {
 
   async function toggleFavorite(p: Product) {
     if (!uid) return;
-    const ref = firestore()
-      .collection('users')
-      .doc(uid)
-      .collection('favorites')
-      .doc(String(p.id));
-    const exists = ids.has(p.id);
-    if (exists) {
-      await ref.delete();
+    const db = getFirestore();
+    const ref = doc(
+      collection(doc(collection(db, 'users'), uid), 'favorites'),
+      String(p.id),
+    );
+    if (ids.has(p.id)) {
+      await deleteDoc(ref);
     } else {
-      const doc: Favorite = {
+      await setDoc(ref, {
         id: p.id,
         title: p.title,
         price: p.price,
         image: p.image,
         createdAt: Date.now(),
-      };
-      await ref.set(doc);
+      } satisfies Favorite as any);
     }
   }
 

@@ -1,4 +1,5 @@
-import React from 'react';
+// src/navigation/AppNavigator.tsx
+import React, { useEffect, useState } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
@@ -20,8 +21,19 @@ function AppTabs() {
 
 export default function AppNavigator() {
   const { user, loading } = useAuth();
+  const [bootBypass, setBootBypass] = useState(false);
 
-  if (loading) {
+  useEffect(() => {
+    console.log('[NAV] render -> loading:', loading, 'user:', user?.uid);
+  }, [loading, user]);
+
+  // Bypass de segurança: mesmo se loading bugasse, libera após 4s
+  useEffect(() => {
+    const t = setTimeout(() => setBootBypass(true), 4000);
+    return () => clearTimeout(t);
+  }, []);
+
+  if (loading && !bootBypass) {
     return (
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
         <ActivityIndicator />

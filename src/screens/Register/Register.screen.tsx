@@ -11,7 +11,7 @@ export default function RegisterScreen() {
     try {
       await signUp(email, password);
     } catch (e: any) {
-      Alert.alert('Erro no cadastro', e?.message ?? String(e));
+      Alert.alert('Erro no cadastro', `${e?.code ?? ''}\n${e?.message ?? String(e)}`);
     }
   }
 
