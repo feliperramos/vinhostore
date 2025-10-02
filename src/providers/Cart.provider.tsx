@@ -51,7 +51,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     dec: (id: number) => dispatch({ type: 'dec', id }),
     remove: (id: number) => dispatch({ type: 'remove', id }),
     clear: () => dispatch({ type: 'clear' }),
-  }), [state]);
+  }), [count, state]);
 
   return <CartCtx.Provider value={value}>{children}</CartCtx.Provider>;
 }

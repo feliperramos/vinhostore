@@ -6,17 +6,39 @@ import { ProductsScreen, WishListScreen, LoginScreen, RegisterScreen, SettingsSc
 import { useAuth } from '@/providers/Auth.provider';
 import { ActivityIndicator, View, StatusBar, TextStyle } from 'react-native';
 import { useTheme } from '@/providers/Theme.provider';
+import { Icon } from '@/components';
 
 const Stack = createNativeStackNavigator();
 const Tabs = createBottomTabNavigator();
 
+const ProductTabBarIcon = ({ color }: { color: string }) => <Icon name="home" color={color} />;
+const FavoriteTabBarIcon = ({ color }: { color: string }) => <Icon name="heart" color={color} />;
+const SettingsTabBarIcon = ({ color }: { color: string }) => <Icon name="settings" color={color} />;
+const CartTabBarIcon = ({ color }: { color: string }) => <Icon name="cart" color={color} />;
+
 function AppTabs({ screenOptions }: { screenOptions: any }) {
   return (
     <Tabs.Navigator screenOptions={screenOptions}>
-      <Tabs.Screen name="Produtos" component={ProductsScreen} />
-      <Tabs.Screen name="Favoritos" component={WishListScreen} />
-      <Tabs.Screen name="Settings" options={{ title: 'Config' }} component={SettingsScreen} />
-      <Tabs.Screen name="Cart" options={{ title: 'Carrinho' }} component={CartScreen} />
+      <Tabs.Screen
+        name="Produtos"
+        component={ProductsScreen}
+        options={{ tabBarIcon: ProductTabBarIcon }}
+      />
+      <Tabs.Screen
+        name="Favoritos"
+        component={WishListScreen}
+        options={{ tabBarIcon: FavoriteTabBarIcon }}
+      />
+      <Tabs.Screen
+        name="Settings"
+        component={SettingsScreen}
+        options={{ title: 'Config', tabBarIcon: SettingsTabBarIcon }}
+      />
+      <Tabs.Screen
+        name="Cart"
+        component={CartScreen}
+        options={{ title: 'Carrinho', tabBarIcon: CartTabBarIcon }}
+      />
     </Tabs.Navigator>
   );
 }

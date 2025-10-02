@@ -5,6 +5,7 @@ import { useTheme } from '@/providers/Theme.provider';
 import { Text } from '@/components/Text/Text.component';
 import { Button } from '@/components/Button/Button.component';
 import type { Theme } from '@/theme/tokens';
+import { Icon } from '../Icon/Icon.component';
 
 type Props = {
   product: Product;
@@ -23,7 +24,7 @@ export function ProductCard({ product, isFavorite, onToggleFavorite, onAddToCart
       <View style={s.imageWrap}>
         <Image source={{ uri: product.image }} style={s.image} resizeMode="contain" />
         <TouchableOpacity onPress={onToggleFavorite} style={s.heart}>
-          <Text style={{ fontSize: 18 }}>{isFavorite ? '❤️' : '🤍'}</Text>
+          <Icon name="heart" size={20} color={isFavorite ? theme.colors.primary : theme.colors.textMuted} />
         </TouchableOpacity>
       </View>
 
