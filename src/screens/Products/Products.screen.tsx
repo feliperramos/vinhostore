@@ -1,16 +1,18 @@
 import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, FlatList, RefreshControl, SafeAreaView, View, Button } from 'react-native';
+import { ActivityIndicator, FlatList, RefreshControl, SafeAreaView, View } from 'react-native';
 import { fetchProducts } from '@/api/fakestore.service';
 import type { Product } from '@/types';
-import { ProductCard } from '@/components';
+import { ProductCard, Button } from '@/components';
 import { useFavorites } from '@/hooks/useFavorite';
 import { useAuth } from '@/providers/Auth.provider';
+import { useTheme } from '@/providers/Theme.provider';
 
 export default function ProductsScreen() {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [products, setProducts] = useState<Product[]>([]);
   const { favoriteIds, toggleFavorite } = useFavorites();
+  const { preference, setPreference, theme } = useTheme();
   const { signOut } = useAuth();
 
   async function load() {
@@ -39,6 +41,13 @@ export default function ProductsScreen() {
     <SafeAreaView style={{ flex: 1 }}>
       <View style={{ padding: 12 }}>
         <Button title="Sair" onPress={signOut} />
+      </View>
+      <View style={{ padding: theme.spacing.md, gap: theme.spacing.sm }}>
+        <Button
+          variant="outline"
+          title={`Tema: ${preference} (trocar)`}
+          onPress={() => setPreference(preference === 'dark' ? 'light' : preference === 'light' ? 'system' : 'dark')}
+        />
       </View>
       <FlatList
         data={products}
