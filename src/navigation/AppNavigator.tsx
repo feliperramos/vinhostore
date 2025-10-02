@@ -24,11 +24,6 @@ export default function AppNavigator() {
   const [bootBypass, setBootBypass] = useState(false);
 
   useEffect(() => {
-    console.log('[NAV] render -> loading:', loading, 'user:', user?.uid);
-  }, [loading, user]);
-
-  // Bypass de segurança: mesmo se loading bugasse, libera após 4s
-  useEffect(() => {
     const t = setTimeout(() => setBootBypass(true), 4000);
     return () => clearTimeout(t);
   }, []);

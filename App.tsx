@@ -1,23 +1,19 @@
-import '@react-native-firebase/app';
 import React, { useEffect } from 'react';
+import '@react-native-firebase/app';
 import { ThemeProvider } from '@/providers/Theme.provider';
 import { AuthProvider } from '@/providers/Auth.provider';
+import { CartProvider } from '@/providers/Cart.provider';
 import AppNavigator from '@/navigation/AppNavigator';
 import { initPush } from '@/utils/push';
 
 export default function App() {
-  useEffect(() => {
-    let cleanupFn: (() => void) | undefined;
-    const promise = initPush();
-    promise.then(fn => {
-      cleanupFn = fn;
-    });
-    return () => { cleanupFn?.(); };
-  }, []);
+  useEffect(() => { (async () => { (await initPush)?.(); })(); }, []);
   return (
     <ThemeProvider>
       <AuthProvider>
-        <AppNavigator />
+        <CartProvider>
+          <AppNavigator />
+        </CartProvider>
       </AuthProvider>
     </ThemeProvider>
   );

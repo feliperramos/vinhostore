@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from 'react';
+// src/screens/ProductsScreen.tsx
+import React, { useEffect, useState, useMemo } from 'react';
 import { ActivityIndicator, FlatList, RefreshControl, SafeAreaView, View } from 'react-native';
 import { fetchProducts } from '@/api/fakestore.service';
 import type { Product } from '@/types';
@@ -6,60 +7,72 @@ import { ProductCard, Button } from '@/components';
 import { useFavorites } from '@/hooks/useFavorite';
 import { useAuth } from '@/providers/Auth.provider';
 import { useTheme } from '@/providers/Theme.provider';
+import { useCart } from '@/providers/Cart.provider';
+import { ProductDetailModal } from './components';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
-export default function ProductsScreen() {
+type Props = NativeStackScreenProps<any>;
+
+export default function ProductsScreen({ navigation }: Props) {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [products, setProducts] = useState<Product[]>([]);
+  const [selected, setSelected] = useState<Product | null>(null);
+
   const { favoriteIds, toggleFavorite } = useFavorites();
-  const { preference, setPreference, theme } = useTheme();
   const { signOut } = useAuth();
+  const { theme } = useTheme();
+  const { add, count } = useCart();
 
   async function load() {
-    setLoading(true);
     try {
-      const data = await fetchProducts();
-      setProducts(data);
-    } finally {
-      setLoading(false);
-    }
+      setLoading(true);
+      setProducts(await fetchProducts());
+    } finally { setLoading(false); }
   }
+  useEffect(() => { load(); }, []);
 
-  useEffect(() => {
-    load();
-  }, []);
+  const renderItem = ({ item }: { item: Product }) => (
+    <ProductCard
+      product={item}
+      isFavorite={favoriteIds.has(item.id)}
+      onToggleFavorite={() => toggleFavorite(item)}
+      onAddToCart={() => add(item)}
+      onPress={() => setSelected(item)}
+    />
+  );
 
   if (loading) {
-    return (
-      <SafeAreaView style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-        <ActivityIndicator />
-      </SafeAreaView>
-    );
+    return <SafeAreaView style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: theme.colors.bg }}>
+      <ActivityIndicator />
+    </SafeAreaView>;
   }
 
   return (
-    <SafeAreaView style={{ flex: 1 }}>
-      <View style={{ padding: 12 }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: theme.colors.bg }}>
+      <View style={{ padding: theme.spacing.md, gap: theme.spacing.sm, flexDirection: 'row', justifyContent: 'space-between' }}>
+        <Button variant="outline" title="Configurações" onPress={() => navigation.navigate('Settings')} />
+        <Button variant="outline" title={`Carrinho (${count})`} onPress={() => navigation.navigate('Cart')} />
         <Button title="Sair" onPress={signOut} />
       </View>
-      <View style={{ padding: theme.spacing.md, gap: theme.spacing.sm }}>
-        <Button
-          variant="outline"
-          title={`Tema: ${preference} (trocar)`}
-          onPress={() => setPreference(preference === 'dark' ? 'light' : preference === 'light' ? 'system' : 'dark')}
-        />
-      </View>
+
       <FlatList
         data={products}
         keyExtractor={(item) => String(item.id)}
-        renderItem={({ item }) => (
-          <ProductCard
-            product={item}
-            isFavorite={favoriteIds.has(item.id)}
-            onToggleFavorite={() => toggleFavorite(item)}
-          />
-        )}
-        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={async () => { setRefreshing(true); await load(); setRefreshing(false); }} />}
+        renderItem={renderItem}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={async () => { setRefreshing(true); await load(); setRefreshing(false); }} />
+        }
+        contentContainerStyle={{ paddingBottom: theme.spacing.xl }}
+      />
+
+      <ProductDetailModal
+        visible={!!selected}
+        product={selected}
+        onClose={() => setSelected(null)}
+        onAdd={(p) => { add(p); setSelected(null); }}
+        onToggleFav={(p) => toggleFavorite(p)}
+        isFav={selected ? favoriteIds.has(selected.id) : false}
       />
     </SafeAreaView>
   );

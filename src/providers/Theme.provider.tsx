@@ -17,14 +17,12 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [preference, setPreferenceState] = useState<Pref>('system');
   const [scheme, setScheme] = useState<ColorSchemeName>(Appearance.getColorScheme());
 
-  // carrega preferência salva
   useEffect(() => {
     AsyncStorage.getItem(KEY).then(v => {
       if (v === 'light' || v === 'dark' || v === 'system') setPreferenceState(v);
     });
   }, []);
 
-  // observa sistema
   useEffect(() => {
     const sub = Appearance.addChangeListener(({ colorScheme }) => setScheme(colorScheme));
     return () => sub.remove();

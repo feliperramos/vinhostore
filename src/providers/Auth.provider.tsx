@@ -32,25 +32,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     (async () => {
       try {
-        console.log('[AUTH] effect start');
         const auth = getAuth();
-        console.log('[AUTH] getAuth ok');
 
         unsub = onAuthStateChanged(auth, (u) => {
-          console.log('[AUTH] onAuthStateChanged ->', u ? u.uid : 'null');
           if (!mounted.current) return;
           setUser(u ?? null);
           setLoading(false);
         });
 
-        // Fallback anti-trava: libera se nada vier em 3s
         timer = setTimeout(() => {
           if (!mounted.current) return;
-          console.warn('[AUTH] fallback liberando loading');
           setLoading(false);
         }, 3000);
       } catch (err) {
-        console.error('[AUTH] init error:', err);
         if (mounted.current) setLoading(false);
       }
     })();
