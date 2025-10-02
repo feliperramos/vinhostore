@@ -1,34 +1,36 @@
 import React from 'react';
-import { Pressable, Text, ViewStyle } from 'react-native';
+import { Text, ViewStyle, StyleProp, TouchableOpacity } from 'react-native';
 import { useTheme } from '@/providers/Theme.provider';
+import { createButtonStyles } from './Button.styles';
 
 type Props = {
   title: string;
   onPress?: () => void;
   variant?: 'primary' | 'outline' | 'danger';
-  style?: ViewStyle;
+  style?: StyleProp<ViewStyle>;
 };
 
 export function Button({ title, onPress, variant = 'primary', style }: Props) {
   const { theme } = useTheme();
-  const base = {
-    paddingVertical: theme.spacing.md,
-    paddingHorizontal: theme.spacing.lg,
-    borderRadius: theme.radius.md,
-    borderWidth: 1,
-  };
+  const styles = createButtonStyles(theme);
 
-  const variants: Record<NonNullable<Props['variant']>, ViewStyle & { textColor: string }> = {
-    primary: { backgroundColor: theme.colors.primary, borderColor: theme.colors.primary, textColor: theme.colors.primaryText },
-    outline: { backgroundColor: 'transparent', borderColor: theme.colors.border, textColor: theme.colors.text },
-    danger: { backgroundColor: theme.colors.danger, borderColor: theme.colors.danger, textColor: theme.colors.primaryText },
-  };
+  const containerVariant =
+    variant === 'primary'
+      ? styles.containerPrimary
+      : variant === 'outline'
+        ? styles.containerOutline
+        : styles.containerDanger;
 
-  const v = variants[variant];
+  const titleVariant =
+    variant === 'primary'
+      ? styles.titlePrimary
+      : variant === 'outline'
+        ? styles.titleOutline
+        : styles.titleDanger;
 
   return (
-    <Pressable onPress={onPress} style={[base, v, style as any]}>
-      <Text style={{ textAlign: 'center', color: v.textColor, fontWeight: '700', fontSize: 16 }}>{title}</Text>
-    </Pressable>
+    <TouchableOpacity onPress={onPress} style={[styles.containerBase, containerVariant, style]} >
+      <Text style={[styles.titleBase, titleVariant]}>{title}</Text>
+    </TouchableOpacity>
   );
 }

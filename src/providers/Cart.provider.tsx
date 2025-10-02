@@ -18,6 +18,7 @@ const CartCtx = createContext<{
   dec: (id: number) => void;
   remove: (id: number) => void;
   clear: () => void;
+  getQuantity: (id: number) => number;   // 👈 novo
 }>({} as any);
 
 function reducer(state: State, action: Action): State {
@@ -41,7 +42,10 @@ function reducer(state: State, action: Action): State {
 
 export function CartProvider({ children }: { children: React.ReactNode }) {
   const [state, dispatch] = useReducer(reducer, { items: {} });
-  const count = useMemo(() => Object.values(state.items).reduce((a, b) => a + b.qty, 0), [state.items]);
+  const count = useMemo(
+    () => Object.values(state.items).reduce((a, b) => a + b.qty, 0),
+    [state.items]
+  );
 
   const value = useMemo(() => ({
     state,
@@ -51,6 +55,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     dec: (id: number) => dispatch({ type: 'dec', id }),
     remove: (id: number) => dispatch({ type: 'remove', id }),
     clear: () => dispatch({ type: 'clear' }),
+    getQuantity: (id: number) => state.items[id]?.qty ?? 0,   // 👈 novo
   }), [count, state]);
 
   return <CartCtx.Provider value={value}>{children}</CartCtx.Provider>;

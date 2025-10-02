@@ -1,30 +1,51 @@
-import React from 'react';
-import { View, Image, StyleSheet, TouchableOpacity, Pressable } from 'react-native';
+import React, { useMemo } from 'react';
+import { View, Image, Pressable, TouchableOpacity } from 'react-native';
 import type { Product } from '@/types';
 import { useTheme } from '@/providers/Theme.provider';
 import { Text } from '@/components/Text/Text.component';
 import { Button } from '@/components/Button/Button.component';
+import { Icon } from '@/components/Icon/Icon.component';
 import type { Theme } from '@/theme/tokens';
-import { Icon } from '../Icon/Icon.component';
+import { createProductCardStyles } from './ProductCard.styles';
 
 type Props = {
   product: Product;
   isFavorite?: boolean;
   onToggleFavorite?: () => void;
   onAddToCart?: () => void;
-  onPress?: () => void; // abrir modal de detalhe
+  onPress?: () => void;
+  quantity?: number;
+  onDecrease?: () => void;
+  onRemove?: () => void;
 };
 
-export function ProductCard({ product, isFavorite, onToggleFavorite, onAddToCart, onPress }: Props) {
+export function ProductCard({
+  product,
+  isFavorite,
+  onToggleFavorite,
+  onAddToCart,
+  onPress,
+  quantity = 0,
+  onDecrease,
+  onRemove,
+}: Props) {
   const { theme } = useTheme();
-  const s = getStyles(theme);
+  const s = useMemo(() => createProductCardStyles(theme as Theme), [theme]);
+
+  const heartColor = isFavorite ? theme.colors.danger : theme.colors.textMuted;
+  const inCart = quantity > 0;
 
   return (
     <Pressable onPress={onPress} style={s.card}>
       <View style={s.imageWrap}>
         <Image source={{ uri: product.image }} style={s.image} resizeMode="contain" />
-        <TouchableOpacity onPress={onToggleFavorite} style={s.heart}>
-          <Icon name="heart" size={20} color={isFavorite ? theme.colors.primary : theme.colors.textMuted} />
+        <TouchableOpacity
+          onPress={onToggleFavorite}
+          style={s.heartBtn}
+          accessibilityRole="button"
+          accessibilityLabel={isFavorite ? 'Remover dos favoritos' : 'Adicionar aos favoritos'}
+        >
+          <Icon name="heart" size={22} color={heartColor} fill={heartColor} />
         </TouchableOpacity>
       </View>
 
@@ -33,26 +54,47 @@ export function ProductCard({ product, isFavorite, onToggleFavorite, onAddToCart
         <Text style={s.price}>$ {product.price.toFixed(2)}</Text>
       </View>
 
-      <Button title="Adicionar" onPress={onAddToCart} />
+      <View style={s.footer}>
+        {!inCart ? (
+          <Button title="Adicionar" onPress={onAddToCart} />
+        ) : (
+          <View style={s.controlsRow}>
+            {/* Esquerda: lixeira se qty==1, senão "-" */}
+            {quantity === 1 ? (
+              <TouchableOpacity
+                onPress={onRemove}
+                style={[s.pillBtn, s.pillDanger]}
+                accessibilityRole="button"
+                accessibilityLabel="Remover do carrinho"
+              >
+                <Icon name="trash" size={18} color={theme.colors.primaryText} />
+              </TouchableOpacity>
+            ) : (
+              <TouchableOpacity
+                onPress={onDecrease}
+                style={s.pillBtn}
+                accessibilityRole="button"
+                accessibilityLabel="Diminuir quantidade"
+              >
+                <Text style={s.pillText}>−</Text>
+              </TouchableOpacity>
+            )}
+
+            <View style={s.qtyBadge}>
+              <Text style={s.qtyText}>{quantity}</Text>
+            </View>
+
+            <TouchableOpacity
+              onPress={onAddToCart}
+              style={s.pillBtn}
+              accessibilityRole="button"
+              accessibilityLabel="Aumentar quantidade"
+            >
+              <Text style={s.pillText}>+</Text>
+            </TouchableOpacity>
+          </View>
+        )}
+      </View>
     </Pressable>
   );
 }
-
-const getStyles = (theme: Theme) => StyleSheet.create({
-  card: {
-    backgroundColor: theme.colors.card,
-    borderRadius: theme.radius.lg,
-    padding: theme.spacing.md,
-    borderWidth: 1,
-    borderColor: theme.colors.border,
-    marginHorizontal: theme.spacing.md,
-    marginVertical: theme.spacing.sm,
-    shadowColor: '#000', shadowOpacity: 0.08, shadowRadius: 8, elevation: 2,
-  },
-  imageWrap: { alignItems: 'center' },
-  image: { width: 110, height: 110 },
-  heart: { position: 'absolute', right: 4, top: 4, padding: theme.spacing.xs },
-  info: { marginTop: theme.spacing.sm, marginBottom: theme.spacing.md },
-  title: { fontSize: 14, fontWeight: '600', color: theme.colors.text },
-  price: { fontSize: 16, fontWeight: '700', color: theme.colors.primary, marginTop: 6 },
-});

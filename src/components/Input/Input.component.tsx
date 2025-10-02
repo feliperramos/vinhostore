@@ -1,12 +1,12 @@
-import React, { useMemo, useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { View, TextInput as RNTextInput, Pressable, TextInputProps } from 'react-native';
 import { useTheme } from '@/providers/Theme.provider';
-import { createInputStyles } from './Input.styles';
 import { Icon } from '@/components';
+import { createInputStyles } from './Input.styles';
 
 export function Input({ secureTextEntry, style, ...props }: TextInputProps) {
   const { theme } = useTheme();
-  const styles = useMemo(() => createInputStyles(theme), [theme]);
+  const styles = createInputStyles(theme);
 
   const isPassword = !!secureTextEntry;
   const [passwordVisible, setPasswordVisible] = useState(false);

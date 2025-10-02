@@ -8,6 +8,7 @@ import ShoppingCart from '@/assets/icons/basket-bold.svg';
 import Star from '@/assets/icons/star-bold.svg';
 import Eye from '@/assets/icons/eye.svg';
 import EyeClosed from '@/assets/icons/eye-slash.svg';
+import Trash from '@/assets/icons/trash-bold.svg';
 
 const registry = {
   home: House,
@@ -17,6 +18,7 @@ const registry = {
   star: Star,
   eye: Eye,
   eyeClosed: EyeClosed,
+  trash: Trash,
 };
 
 export type IconName = keyof typeof registry;
