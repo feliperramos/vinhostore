@@ -25,7 +25,7 @@ Um app **exemplo de e-commerce** mobile feito com **React Native** e **Firebase*
 
 ---
 
-## 🗂️ Organização do projeto
+## Organização do projeto
 
 ```
 src/
@@ -57,7 +57,7 @@ users/{uid}/favorites/{productId}
 
 ---
 
-## 📸 Screens & Push
+## Screens & Push
 
 - Login / Cadastro
 - Produtos (lista, favoritar, adicionar ao carrinho)
@@ -204,7 +204,7 @@ yarn add -D eslint @react-native-community/eslint-config   @typescript-eslint/pa
 
 ---
 
-## 📜 Créditos & Licença
+## Créditos & Licença
 
 - Produtos: **[Fake Store API](https://fakestoreapi.com/)**
 - Firebase: **Auth / Firestore / Messaging**

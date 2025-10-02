@@ -20,10 +20,32 @@ export default function LoginScreen({ navigation }: Props) {
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: theme.colors.bg }}>
       <View style={[styles.container, { padding: theme.spacing.lg }]}>
-        <Text style={{ fontSize: 24, fontWeight: '800', textAlign: 'center', marginBottom: theme.spacing.lg }}>Entrar</Text>
-        <Input placeholder="Email" autoCapitalize="none" keyboardType="email-address" value={email} onChangeText={setEmail} />
+        <Text style={{ fontSize: 24, fontWeight: '800', textAlign: 'center', marginBottom: theme.spacing.lg }}>
+          Entrar
+        </Text>
+
+        <Input
+          placeholder="Email"
+          autoCapitalize="none"
+          keyboardType="email-address"
+          value={email}
+          onChangeText={setEmail}
+          textContentType="username"
+        />
+
         <View style={{ height: theme.spacing.sm }} />
-        <Input placeholder="Senha" secureTextEntry value={password} onChangeText={setPassword} />
+
+        <Input
+          placeholder="Senha"
+          secureTextEntry
+          value={password}
+          onChangeText={setPassword}
+          textContentType="password"
+          autoCapitalize="none"
+          autoCorrect={false}
+          returnKeyType="done"
+        />
+
         <View style={{ height: theme.spacing.md }} />
         <Button title="Entrar" onPress={onLogin} />
         <View style={{ height: theme.spacing.sm }} />
@@ -32,4 +54,5 @@ export default function LoginScreen({ navigation }: Props) {
     </SafeAreaView>
   );
 }
+
 const styles = StyleSheet.create({ container: { flex: 1, justifyContent: 'center' } });
