@@ -6,6 +6,6 @@
       "@/*": ["src/*"]
     }
   },
-  "include": ["src", "**/*.ts", "**/*.tsx"],
+  "include": ["src", "**/*.ts", "**/*.tsx", "__mocks__/fileMocks.js", "__mocks__/svgMocks.js"],
   "exclude": ["**/node_modules", "**/Pods"]
 }

@@ -1,4 +1,10 @@
-import 'react-native-gesture-handler/jestSetup';
+try { require('@testing-library/jest-native/extend-expect'); } catch { }
+
+require('react-native-gesture-handler/jestSetup');
+
+try {
+  jest.mock('react-native/Libraries/Animated/NativeAnimatedHelper', () => ({}));
+} catch { }
 
 jest.mock(
   '@react-native-async-storage/async-storage',
@@ -48,4 +54,40 @@ jest.mock('@react-native-firebase/messaging', () => {
     onTokenRefresh: jest.fn(() => jest.fn()),
   };
   return () => api;
+});
+
+jest.mock('@/components/Icon/Icon.component', () => {
+  const React = require('react');
+  const { View } = require('react-native');
+  return {
+    Icon: (props) => React.createElement(View, { accessibilityRole: 'image', ...props }),
+  };
+});
+
+const originalWarn = console.warn;
+const originalLog = console.log;
+
+console.warn = (...args) => {
+  const msg = String(args[0] ?? '');
+  if (
+    msg.includes('SafeAreaView has been deprecated') ||
+    msg.includes('Require cycle:') ||
+    msg.includes('new NativeEventEmitter') ||
+    msg.includes('VirtualizedLists should never be nested')
+  ) return;
+  originalWarn(...args);
+};
+
+console.log = (...args) => {
+  const msg = String(args[0] ?? '');
+  if (msg.startsWith('[FCM]')) return;
+  originalLog(...args);
+};
+
+const { cleanup } = require('@testing-library/react-native');
+
+afterEach(() => {
+  cleanup();
+  jest.clearAllMocks();
+  jest.clearAllTimers();
 });
