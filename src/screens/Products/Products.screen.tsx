@@ -1,13 +1,11 @@
 // src/screens/ProductsScreen.tsx
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, FlatList, RefreshControl, SafeAreaView, View } from 'react-native';
 import { fetchProducts } from '@/api/fakestore.service';
 import type { Product } from '@/types';
 import { ProductCard, Button } from '@/components';
 import { useFavorites } from '@/hooks/useFavorite';
-import { useAuth } from '@/providers/Auth.provider';
-import { useTheme } from '@/providers/Theme.provider';
-import { useCart } from '@/providers/Cart.provider';
+import { useAuth, useTheme, useCart } from '@/providers';
 import { ProductDetailModal } from './components';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
